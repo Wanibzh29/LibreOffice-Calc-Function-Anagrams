@@ -1,0 +1,55 @@
+Function Anagrammes(texte As Variant) As String
+    Dim result As Object
+    Set result = CreateObject("Scripting.Dictionary")
+    
+    ' --- Sécurisation de l’entrée ---
+    On Error Resume Next
+    If IsEmpty(texte) Then
+        Anagrammes = ""
+        Exit Function
+    End If
+    texte = CStr(texte)
+    On Error GoTo 0
+    
+    If Len(Trim(texte)) = 0 Then
+        Anagrammes = ""
+        Exit Function
+    End If
+    
+    texte = LCase(Trim(texte))
+    
+    Call Permuter("", texte, result)
+    
+    Dim cle As Variant
+    Dim sortie As String
+    sortie = ""
+    
+    For Each cle In result.Keys
+        sortie = sortie & cle & ", "
+    Next cle
+    
+    If Len(sortie) > 2 Then sortie = Left(sortie, Len(sortie) - 2)
+    
+    Anagrammes = sortie
+End Function
+
+
+Sub Permuter(prefixe As String, reste As String, ByRef result As Object)
+    Dim i As Integer
+    Dim lettre As String
+    Dim avant As String
+    Dim apres As String
+    Dim nouveauReste As String
+    
+    If Len(reste) = 0 Then
+        If Not result.Exists(prefixe) Then result.Add prefixe, True
+    Else
+        For i = 1 To Len(reste)
+            lettre = Mid(reste, i, 1)
+            avant = Mid(reste, 1, i - 1)
+            apres = Mid(reste, i + 1)
+            nouveauReste = avant & apres
+            Call Permuter(prefixe & lettre, nouveauReste, result)
+        Next i
+    End If
+End Sub
